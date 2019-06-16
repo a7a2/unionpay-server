@@ -33,7 +33,7 @@ class MainVerticle : RestVerticle() {
 
         router.get("/order-list").handler { getOrderList(it) }
 
-        router.put("/order/paid").handler { }
+        router.put("/order/paid").handler { orderStatusPaid(it) }
 
         router.errorHandler(500) { routerContext ->
             logger.error { routerContext.failure().message }
