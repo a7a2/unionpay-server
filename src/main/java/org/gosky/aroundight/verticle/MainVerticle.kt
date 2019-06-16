@@ -28,7 +28,13 @@ class MainVerticle : RestVerticle() {
 
     override fun initRouter() {
         router.get("/health").handler { it.success("ok!") }
+
         router.post("/order").handler { createOrder(it) }
+
+        router.get("/order-list").handler { getOrderList(it) }
+
+        router.put("/order/paid").handler { }
+
         router.errorHandler(500) { routerContext ->
             logger.error { routerContext.failure().message }
             routerContext.error("error" to routerContext.failure().message)
@@ -43,6 +49,30 @@ class MainVerticle : RestVerticle() {
         val money = context.bodyAsJson.getString("money")
 
         orderService.createOrder(money.toBigDecimal())
+                .subscribe { t: String? ->
+                    context.success(t)
+                }
+
+    }
+
+    /**
+     * 获取订单列表
+     */
+    private fun getOrderList(context: RoutingContext) {
+        orderService.getOrderList()
+                .subscribe { t ->
+                    context.success(t)
+                }
+    }
+
+    /**
+     * 修改支付状态 => 已支付
+     */
+    private fun orderStatusPaid(context: RoutingContext) {
+
+        val randomMoney = context.bodyAsJson.getDouble("randomMoney")
+
+        orderService.notifyPaid(randomMoney)
                 .subscribe { t: String? ->
                     context.success(t)
                 }
